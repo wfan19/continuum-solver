@@ -2,8 +2,11 @@ classdef Muscle3D < Muscle
 % Implementation of storage, pose calculation, and visualization of a 3D 
 % soft-robot muscle parameterized by a "flow-vector": the se(3) body-velocity
 % of a frame travelling along the curve of the muscle.
-    
+
     properties
+        % Shearing vector (meters) of muscle
+        % Corresponds to the velocity in the body y and z axes of a frame
+        % attached to the curve.
         gamma = [0; 0];
     end
 
@@ -19,6 +22,7 @@ classdef Muscle3D < Muscle
             end
             
             obj@Muscle(l, kappa(:), 'color', options.color)
+            
             obj.g_0 = options.g_0;
             obj.adjoint_X_o = options.adjoint_X_o;
         end
@@ -93,6 +97,22 @@ classdef Muscle3D < Muscle
             plotTransforms(g_muscle.positions, g_muscle.orientations, options.plot_options);
             
             gh = ax.Children(1);
+        end
+        
+        %% Setter function
+        % Called in Muscle.set.h_tilde
+        function [obj] = update_gamma_kappa(obj, h_tilde)
+            % Update gamma if it exists, and safeguard to prevent infitnit
+            % looping
+            if any(obj.gamma ~= h_tilde(2:3) / h_tilde(1))
+                obj.gamma = h_tilde(2:3) / h_tilde(1);
+            end
+
+            % Update kappa accordingly
+            % Safeguard to prvent infinite looping
+            if any(obj.kappa ~= h_tilde(4:end) / h_tilde(1))
+                obj.kappa = h_tilde(4:end) / h_tilde(1);
+            end
         end
     end
 end

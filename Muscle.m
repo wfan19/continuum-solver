@@ -15,7 +15,7 @@ classdef Muscle < handle & matlab.mixin.Copyable
         % Length (meters) of muscle
         l = 0.1
         
-        % Curvature (1 / meters) of muscle
+        % Curvature of muscle
         kappa
         
         % Flow vector of muscle
@@ -54,21 +54,13 @@ classdef Muscle < handle & matlab.mixin.Copyable
         function set.l(obj, l)
             obj.l = l;
             % Update h_tilde accordingly
-            if length(obj.h_tilde) == 3 % Check if 2d or 3d flow vector
-                obj.h_tilde = obj.l * [1; 0; obj.kappa]; 
-            else
-                obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
-            end
+            obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
         end
         
         function set.kappa(obj, kappa)
             obj.kappa = kappa;
             % Update h_tilde accordingly
-            if length(obj.h_tilde) == 3
-                obj.h_tilde = obj.l * [1; 0; obj.kappa]; 
-            else
-                obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
-            end
+            obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
         end
         
         % Function that updates kappa and l values based on an updated
@@ -82,17 +74,9 @@ classdef Muscle < handle & matlab.mixin.Copyable
                 obj.l = h_tilde(1);
             end
             
-            % Update gamma if it exists, and safeguard to prevent infitnit
-            % looping
-            if any(obj.gamma ~= h_tilde(2:3) / h_tilde(1))
-                obj.gamma = h_tilde(2:3) / h_tilde(1);
-            end
-            
-            % Update kappa accordingly
-            % Safeguard to prvent infinite looping
-            if any(obj.kappa ~= h_tilde(4:end) / h_tilde(1))
-                obj.kappa = h_tilde(4:end) / h_tilde(1);
-            end
+            % Update gamma and kappa (implementation specific)
+            obj.update_gamma_kappa(h_tilde);
+
         end
         
         %% Member functions
