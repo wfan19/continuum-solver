@@ -21,8 +21,8 @@ else % Three inputs: Reconstruct position vector
     t = [x; y];
 end
 
-if numel(arg1) == 9
-    R = arg1(1:2, 1:2);
+if numel(theta) == 9
+    R = theta(1:2, 1:2);
 else
     R = SO2(theta);
 end
