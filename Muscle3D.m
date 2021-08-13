@@ -16,8 +16,8 @@ classdef Muscle3D < Muscle
             arguments
                 l (1, 1) double
                 kappa (3, 1) double = zeros(3, 1);
-                options.adjoint_X_o = eye(3);
-                options.g_0 = eye(3)
+                options.adjoint_X_o = eye(4);
+                options.g_0 = eye(4)
                 options.color = 'k'
             end
             
@@ -35,6 +35,7 @@ classdef Muscle3D < Muscle
                 obj
                 h_tilde = obj.h_tilde; % Flow vector
                 options.n = 1; % Number of points along the curve for the poses to be calculated at (0 - 1, percentage).
+                options.g_offset = eye(4);
             end
             t = linspace(0, 1, options.n);
             
@@ -45,7 +46,7 @@ classdef Muscle3D < Muscle
             % pose for each point
             for i = 1 : length(t)
                 % Calculate and save the transformation for each point              
-                SE3_pose_i = obj.g_0 * expm_se3(t(i) * h_tilde);
+                SE3_pose_i = options.g_offset * obj.g_0 * expm_se3(t(i) * h_tilde);
                 positions(i, :) = SE3_pose_i(1:3, 4);
                 orientations(i, :) = rotm2quat(SE3_pose_i(1:3, 1:3));
             end
@@ -55,13 +56,14 @@ classdef Muscle3D < Muscle
         
         % Plot the current muscle curve on the given line handle. If a
         % line handle is not provided, create a new one on the current axis
-        function [lh, obj] = plot_muscle(obj, ax, lh, options)
+        function [lh, g_muscle, obj] = plot_muscle(obj, ax, lh, options)
             arguments
                 obj
                 ax = gca()
                 lh = obj.lh;
                 options.resolution = obj.default_res;
                 options.line_options = struct() % Additional keyword-arguments for the line options
+                options.g_offset = eye(4);
             end
             
             if lh == 0 % Uninitialized line handle
@@ -69,7 +71,7 @@ classdef Muscle3D < Muscle
                 obj.lh = lh;
             end
             
-            g_muscle = obj.calc_posns('n', options.resolution);
+            g_muscle = obj.calc_posns('n', options.resolution, 'g_offset', options.g_offset);
             if ax ~= lh.Parent
                 lh.Parent = ax;
             end
@@ -86,14 +88,15 @@ classdef Muscle3D < Muscle
         function [gh, g_muscle] = plot_tforms(obj, ax, options)
             arguments
                 obj
-                ax
+                ax = gca
                 options.g_muscle
                 options.resolution = obj.default_res;
                 options.plot_options = struct(); % Additional keyword-arguments for the plotTransform options
+                options.g_offset = eye(4);
             end
             options.plot_options.parent = ax;
             
-            g_muscle = obj.calc_posns('n', options.resolution);
+            g_muscle = obj.calc_posns('n', options.resolution, 'g_offset', options.g_offset);
             plotTransforms(g_muscle.positions, g_muscle.orientations, options.plot_options);
             
             gh = ax.Children(1);
