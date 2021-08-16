@@ -101,9 +101,11 @@ classdef Muscle < handle & matlab.mixin.Copyable
             % Regular copy of all elements
             cp = copyElement@matlab.mixin.Copyable(obj);
             
-            % Copy value of line-handle
-            cp.lh = copy(obj.lh);
-            cp.lh.Parent = obj.lh.Parent;
+            % Copy value of line-handle if initialized
+            if obj.lh ~= 0
+                cp.lh = copy(obj.lh);
+                cp.lh.Parent = obj.lh.Parent;
+            end
         end
     end
 end
