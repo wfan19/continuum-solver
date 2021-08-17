@@ -13,6 +13,7 @@ classdef Arm2D < Arm
             end
             
             %%% Create base curve "muscle" for visualization purposes
+            obj.g_o = g_o;
             obj.muscle_o = Muscle2D(l_0, 0, "adjoint_X_o", eye(3), "g_0", g_o);
             
             %%% Preallocate muscle arrays
