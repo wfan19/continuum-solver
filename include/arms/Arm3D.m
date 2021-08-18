@@ -68,11 +68,13 @@ classdef Arm3D < Arm
             arguments
                 obj
                 ax
+                options.resolution = 20;
                 options.line_options_muscles = struct();
                 options.line_options_circles = struct();
             end
             % Call superclass plotting initialization
-            initialize_plotting@Arm(obj, ax, "line_options_muscles", options.line_options_muscles);
+            initialize_plotting@Arm(obj, ax, "line_options_muscles", options.line_options_muscles, ...
+                "resolution", options.resolution);
             
             % Label third axis
             zlabel(ax, "Z");

@@ -29,6 +29,7 @@ classdef Arm < handle
             arguments
                 obj
                 ax
+                options.resolution = 20
                 options.line_options_muscles = obj.line_options_muscles
             end
             
@@ -40,6 +41,8 @@ classdef Arm < handle
             ylabel(ax, "Y");
             
             for i = 1 : length(obj.muscles)
+                obj.muscles(i).default_res = options.resolution;
+                
                 % Clear existing line handle
                 obj.muscles(i).lh = 0;
                 
@@ -68,14 +71,13 @@ classdef Arm < handle
         % Update arm geometry for a new length-vector - a vector with
         % individual muscle lengths
         % * Generic for both 2D and 3D
-        function h_o_tilde = update_arm(obj, v_l)
+        function h_o_tilde = update_arm(obj, v_l, h_o_tilde)
             arguments
                 obj
                 v_l
+                % Calculate new base-curve flow-vector if one is not provided
+                h_o_tilde = obj.f_h_o_tilde(obj, v_l);
             end
-            
-            %%% Calculate new base-curve flow-vector
-            h_o_tilde = obj.f_h_o_tilde(obj, v_l);
             
             %%% Calculate and plot individual muscle lengths
             for i = 1 : length(obj.muscles)
