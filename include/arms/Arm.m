@@ -8,8 +8,6 @@ classdef Arm < handle
         
         mat_N
         
-        gh_tform
-        
         ax % Plotting axes
         
         line_options_muscles = struct()
@@ -78,6 +76,8 @@ classdef Arm < handle
                 % Calculate new base-curve flow-vector if one is not provided
                 h_o_tilde = obj.f_h_o_tilde(obj, v_l);
             end
+            
+            obj.muscle_o.h_tilde = h_o_tilde;
             
             %%% Calculate and plot individual muscle lengths
             for i = 1 : length(obj.muscles)

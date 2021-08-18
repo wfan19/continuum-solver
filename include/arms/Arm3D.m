@@ -2,9 +2,12 @@ classdef Arm3D < Arm
     
     properties
         v_lh_circles % Array of ring line handles
-        n_circles = 15;
+        n_circles = 15; % Number of circles
         
         rho = 0.02 % Radius of arm
+        
+        plot_base_curve = false;
+        gh_base_curve = 0;
     end
     
     methods
@@ -97,6 +100,40 @@ classdef Arm3D < Arm
             for i = 1 : length(obj.v_lh_circles)
                 g_circle = obj.g_o * expm_se3(h_o_tilde * t_circles(i)) * inv(obj.g_o);
                 plot_circle(obj.v_lh_circles(i), obj.rho, g_circle);
+            end
+            
+            try
+                delete(obj.gh_base_curve);
+            catch
+            end
+            
+            if obj.plot_base_curve
+                plot_options = struct("FrameSize", obj.rho * 0.5);
+                obj.gh_base_curve = obj.muscle_o.plot_tforms(obj.ax, "plot_options", plot_options);
+            end
+        end
+    end
+    
+    methods(Static)
+        % Generate muscle poses in a circle on the Y-Z plane around a given
+        % base-pose
+        function g_muscles = generate_g_muscles(rho, g_o, n_muscles, tilt_angle)
+            theta = linspace(0, 2*pi, n_muscles + 1);
+            theta = theta(1:end-1);
+            
+            % Yaw of each muscle. Flip to -pi/2 to change chirality
+            yaw_muscles = theta + pi/2;
+            
+            % Base rotation matrix for all muscles (tilt angle)
+            % Tilt angle is defined as the angle relative to the base-curve
+            % frame's x axis
+            R_muscles = eul2rotm([0 0 -tilt_angle], 'xyz');
+            
+            g_muscles = cell(1, n_muscles);
+            for i = 1 : n_muscles
+                t_muscle_i = rho * [0; cos(theta(i)); sin(theta(i))];
+                R_muscle_i = eul2rotm([yaw_muscles(i), 0, 0], 'xyz') * R_muscles;
+                g_muscles{i} = g_o * SE3(R_muscle_i, t_muscle_i);
             end
         end
     end
