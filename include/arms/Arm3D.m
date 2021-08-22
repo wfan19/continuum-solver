@@ -102,9 +102,9 @@ classdef Arm3D < Arm
                 plot_circle(obj.v_lh_circles(i), obj.rho, g_circle);
             end
             
-            try
+            if class(obj.gh_base_curve) ~= "double"
                 delete(obj.gh_base_curve);
-            catch
+                obj.gh_base_curve = 0;
             end
             
             if obj.plot_base_curve

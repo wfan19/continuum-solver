@@ -79,6 +79,13 @@ classdef Muscle < handle & matlab.mixin.Copyable
 
         end
         
+        function set.color(obj, color)
+            obj.color = color;
+            if class(obj.lh) ~= "double" % If line handle has been initialized
+                obj.lh.Color = color;
+            end
+        end
+        
         %% Member functions
         % To be implemented in subclasses
         
