@@ -93,8 +93,14 @@ classdef Arm3D < Arm
         end
         
         %% Calculate and plot new arm geometry given new length vector
-        function h_o_tilde = update_arm(obj, v_l)
-            h_o_tilde = update_arm@Arm(obj, v_l);
+        function h_o_tilde = update_arm(obj, v_l, h_o_tilde)
+            arguments
+                obj
+                v_l
+                % Calculate new base-curve flow-vector if one is not provided
+                h_o_tilde = obj.f_h_o_tilde(obj, v_l);
+            end
+            update_arm@Arm(obj, v_l, h_o_tilde);
             
             t_circles = linspace(0, 1, obj.n_circles);
             for i = 1 : length(obj.v_lh_circles)
