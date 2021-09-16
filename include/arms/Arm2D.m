@@ -43,7 +43,11 @@ classdef Arm2D < Arm
             for i = 1 : length(obj.muscles)
                 v_i = obj.muscles(i).adjoint_X_o' * [1; 0; 0];
                 mat_V(:, i) = v_i;
-                mat_M = mat_M + v_i * v_i';
+                %mat_M = mat_M + v_i * v_i';
+                mat_M = mat_M + ...
+                    obj.muscles(i).adjoint_X_o' * ...
+                    diag([1 100 0]) * ...
+                    obj.muscles(i).adjoint_X_o;
             end
             obj.mat_N = pinv(mat_M) * mat_V;
             
