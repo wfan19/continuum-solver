@@ -2,6 +2,10 @@ classdef Arm2D < Arm
     %ARM2D Summary of this class goes here
     %   Detailed explanation goes here
     
+    properties
+        rho = 0
+    end
+    
     methods
         %% Constructor
         function obj = Arm2D(g_o, g_muscles, l_0, options)
@@ -65,10 +69,55 @@ classdef Arm2D < Arm
                 obj
                 ax
                 options.line_options_muscles = obj.line_options_muscles
+                options.line_options_spacers = struct()
+                options.line_options_base_curve = obj.line_options_muscles;
             end
             initialize_plotting@Arm(obj, ax, "line_options_muscles", options.line_options_muscles);
-            % TODO: Add dividers?
+            
+            obj.v_lh_spacers = matlab.graphics.primitive.Line.empty(0, obj.n_spacers);
+            t_spacers = linspace(0, 1, obj.n_spacers);
+            for i = 1 : obj.n_spacers
+                obj.v_lh_spacers(i) = line(0, 0, 'color', 'k', options.line_options_spacers);
+                
+                g_o_i = obj.g_o * expm_se2(t_spacers(i) * obj.muscle_o.h_tilde);
+                g_spacer_i = g_o_i * inv(obj.g_o);
+                
+                plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
+            end
+            
+            % Initialize muscle_o
+            obj.muscle_o.plot_muscle(obj.ax, "line_options", options.line_options_base_curve);
+            
+            if ~ obj.plot_base_curve
+                obj.muscle_o.lh.Visible = false;
+            end
         end
+        
+        %% Calculate and plot new arm geometry given new length vector
+        function h_o_tilde = update_arm(obj, v_l, h_o_tilde)
+            arguments
+                obj
+                v_l
+                % Calculate new base-curve flow-vector if one is not provided
+                h_o_tilde = obj.f_h_o_tilde(obj, v_l);
+            end
+            update_arm@Arm(obj, v_l, h_o_tilde);
+            
+            t_spacers = linspace(0, 1, obj.n_spacers);
+            for i = 1 : obj.n_spacers
+                g_o_i = obj.g_o * expm_se2(t_spacers(i) * h_o_tilde);
+                g_spacer_i = g_o_i * inv(obj.g_o);
+                plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
+            end
+            
+            if obj.plot_base_curve
+                obj.muscle_o.lh.Visible = true;
+                obj.muscle_o.plot_muscle(obj.ax);
+            else
+                obj.muscle_o.lh.Visible = false;
+            end
+        end
+        
     end
 end
 

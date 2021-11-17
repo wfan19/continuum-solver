@@ -8,7 +8,7 @@ classdef Arm < handle
         
         mat_N
         
-        ax % Plotting axes
+        ax = 0 % Plotting axes
         
         line_options_muscles = struct()
         
@@ -16,6 +16,10 @@ classdef Arm < handle
         
         % Base curve flow-vector calculation function handle
         f_h_o_tilde = @f_h_o_tilde_default
+        
+        plot_base_curve = false;
+        v_lh_spacers
+        n_spacers = 4
     end
     
     methods

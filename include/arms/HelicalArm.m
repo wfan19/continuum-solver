@@ -100,10 +100,10 @@ classdef HelicalArm < Arm3D
             end
             
             %%% Plot circles along the arm
-            t_circles = linspace(0, 1, obj.n_circles);
-            for i = 1 : length(obj.v_lh_circles)
+            t_circles = linspace(0, 1, obj.n_spacers);
+            for i = 1 : length(obj.v_lh_spacers)
                 g_circle = g_offset * obj.g_o * expm_se3(h_o_tilde * t_circles(i)) * inv(obj.g_o);
-                plot_circle(obj.v_lh_circles(i), obj.rho, g_circle);
+                plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             
             %%% Plot base curve

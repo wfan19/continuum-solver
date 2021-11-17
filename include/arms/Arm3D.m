@@ -1,12 +1,8 @@
 classdef Arm3D < Arm
     
     properties
-        v_lh_circles % Array of ring line handles
-        n_circles = 15; % Number of circles
-        
         rho = 0.02 % Radius of arm
         
-        plot_base_curve = false;
         gh_base_curve = 0;
     end
     
@@ -85,10 +81,14 @@ classdef Arm3D < Arm
             zlabel(ax, "Z");
 
             % Create line handles for circles
-            obj.v_lh_circles = matlab.graphics.primitive.Line.empty(0, obj.n_circles);
-            for i = 1 : obj.n_circles
-                obj.v_lh_circles(i) = line(0, 0, 0, 'color', 'k', options.line_options_circles);
-                plot_circle(obj.v_lh_circles(i), obj.rho);
+            obj.v_lh_spacers = matlab.graphics.primitive.Line.empty(0, obj.n_spacers);
+            
+            t_circles = linspace(0, 1, obj.n_spacers);
+            for i = 1 : obj.n_spacers
+                obj.v_lh_spacers(i) = line(0, 0, 0, 'color', 'k', options.line_options_circles);
+                
+                g_circle = obj.g_o * expm_se3(obj.muscle_o.h_tilde * t_circles(i)) * inv(obj.g_o);
+                plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             
             view(ax, 10, 10);
@@ -104,10 +104,10 @@ classdef Arm3D < Arm
             end
             update_arm@Arm(obj, v_l, h_o_tilde);
             
-            t_circles = linspace(0, 1, obj.n_circles);
-            for i = 1 : length(obj.v_lh_circles)
+            t_circles = linspace(0, 1, obj.n_spacers);
+            for i = 1 : length(obj.v_lh_spacers)
                 g_circle = obj.g_o * expm_se3(h_o_tilde * t_circles(i)) * inv(obj.g_o);
-                plot_circle(obj.v_lh_circles(i), obj.rho, g_circle);
+                plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             
             if class(obj.gh_base_curve) ~= "double"
