@@ -1,5 +1,5 @@
 classdef Muscle2D < Muscle
-% Implementatino of storage, pose calculation, and visualization of a 2D 
+% Implementation of storage, pose calculation, and visualization of a 2D 
 % soft-robot muscle parameterized by a "flow-vector": the se(2) body-velocity
 % of a frame travelling along the curve of the muscle.
 

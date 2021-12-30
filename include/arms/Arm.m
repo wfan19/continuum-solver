@@ -1,4 +1,16 @@
-classdef Arm < handle
+classdef Arm < handle & matlab.mixin.Copyable
+% Base class for modelling a soft continuum arm constructed of multiple
+% McKibben muscles constrained together by a series of constant/identical
+% separator pieces. 
+% 
+% Stores the associated Muscle objects that control the overall shape of
+% the McKibben Arm itself, as well as the matrices governing the model 
+% Least Squares problem whose solution determins the forward/inverse
+% kinematics of the arm. 
+%
+% Allows for easy initialization, modelling, and plotting of 2D or 3D
+% McKibben Arms
+    
     properties        
         muscles % Array of muscle objects
         muscles_unstrained % Array of muscle objects (for plotting unstrained muscles)
@@ -115,7 +127,22 @@ classdef Arm < handle
         function h_o_tilde = f_h_o_tilde_default(obj, v_l)
             h_o_tilde = obj.mat_N * v_l;
         end
+    end
+    
+    % Copy constructor
+    methods (Access = protected)
         
+        % Copy constructor
+        % Inherited from matlab.mixin.Copyable
+        function cp = copyElement(obj)
+            % Regular copy of all elements
+            cp = copyElement@matlab.mixin.Copyable(obj);
+            
+            % Apply copy cstor for all handle children objects
+            cp.muscles = copy(obj.muscles);
+            cp.muscles_unstrained = copy(obj.muscles_unstrained);
+            cp.v_lh_spacers = copy(obj.muscles);
+        end
     end
 end
 

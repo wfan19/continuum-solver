@@ -1,4 +1,10 @@
 classdef Arm3D < Arm
+% 3D implementation of a McKibben Arm: A soft continuum robot arm
+% constructed of multiple McKibben muscles constrained together by a series
+% of constant/identical separators that create motion through contracting
+% individual muscles.
+%
+% See help text for the base class Arm() for more information
     
     properties
         rho = 0.02 % Radius of arm
