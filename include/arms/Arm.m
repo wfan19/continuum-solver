@@ -141,7 +141,7 @@ classdef Arm < handle & matlab.mixin.Copyable
             % Apply copy cstor for all handle children objects
             cp.muscles = copy(obj.muscles);
             cp.muscles_unstrained = copy(obj.muscles_unstrained);
-            cp.v_lh_spacers = copy(obj.muscles);
+            cp.v_lh_spacers = copy(obj.v_lh_spacers);
         end
     end
 end
