@@ -53,7 +53,7 @@ classdef Arm3D < Arm
             for i = 1 : length(obj.muscles)
                 muscle_i = obj.muscles(i);
                 mat_V(:, i) = muscle_i.adjoint_X_o' * [1; 0; 0; 0; 0; 0];
-                v_k = [1 10 10 0 0 0]';
+                v_k = [1 10 10 0.00025 0.00025 0.00025]';
                 mat_K = diag(v_k);
                 mat_M = mat_M + ...
                     muscle_i.adjoint_X_o' * ...
@@ -136,7 +136,7 @@ classdef Arm3D < Arm
             theta = theta(1:end-1);
             
             % Yaw of each muscle. Flip to -pi/2 to change chirality
-            yaw_muscles = theta + pi/2;
+            yaw_muscles = theta - pi/2;
             
             % Base rotation matrix for all muscles (tilt angle)
             % Tilt angle is defined as the angle relative to the base-curve

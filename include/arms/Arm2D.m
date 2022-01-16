@@ -54,7 +54,7 @@ classdef Arm2D < Arm
                 %mat_M = mat_M + v_i * v_i';
                 mat_M = mat_M + ...
                     obj.muscles(i).adjoint_X_o' * ...
-                    diag([1 100 0]) * ...
+                    diag([1 100 0.00025]) * ...
                     obj.muscles(i).adjoint_X_o;
             end
             obj.mat_N = pinv(mat_M) * mat_V;
@@ -98,12 +98,13 @@ classdef Arm2D < Arm
         end
         
         %% Calculate and plot new arm geometry given new length vector
-        function h_o_tilde = update_arm(obj, v_l, h_o_tilde)
+        function h_o_tilde = update_arm(obj, v_l, h_o_tilde, options)
             arguments
                 obj
                 v_l
                 % Calculate new base-curve flow-vector if one is not provided
                 h_o_tilde = obj.f_h_o_tilde(obj, v_l);
+                options.plotting = true;
             end
             update_arm@Arm(obj, v_l, h_o_tilde);
             
@@ -111,14 +112,18 @@ classdef Arm2D < Arm
             for i = 1 : obj.n_spacers
                 g_o_i = obj.g_o * expm_se2(t_spacers(i) * h_o_tilde);
                 g_spacer_i = g_o_i * inv(obj.g_o);
-                plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
+                if options.plotting && ~isempty(obj.v_lh_spacers)
+                    plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
+                end
             end
             
-            if obj.plot_base_curve
-                obj.muscle_o.lh.Visible = true;
-                obj.muscle_o.plot_muscle(obj.ax);
-            else
-                obj.muscle_o.lh.Visible = false;
+            if options.plotting
+                if obj.plot_base_curve
+                    obj.muscle_o.lh.Visible = true;
+                    obj.muscle_o.plot_muscle(obj.ax);
+                else
+                    obj.muscle_o.lh.Visible = false;
+                end
             end
         end
         
