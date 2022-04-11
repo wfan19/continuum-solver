@@ -34,7 +34,7 @@ classdef Arm2D < Arm
                 g_i = g_muscles{i}; % Muscle pose in world frame
                 g_o_i = g_o_inv * g_i; % Tform from base curve to muscle_i
                 
-                ad_o_i = ad_se2(g_o_i); % Adjoint from base curve to muscle_i
+                ad_o_i = SE2.adjoint(g_o_i); % Adjoint from base curve to muscle_i
                 ad_i_o = inv(ad_o_i); % Adjoint from muscle_i to base curve
                 
                 % Create muscle object
@@ -51,11 +51,7 @@ classdef Arm2D < Arm
             for i = 1 : length(obj.muscles)
                 v_i = obj.muscles(i).adjoint_X_o' * [1; 0; 0];
                 mat_V(:, i) = v_i;
-                %mat_M = mat_M + v_i * v_i';
-                mat_M = mat_M + ...
-                    obj.muscles(i).adjoint_X_o' * ...
-                    diag([1 100 0.00025]) * ...
-                    obj.muscles(i).adjoint_X_o;
+                mat_M = mat_M + v_i * v_i';
             end
             obj.mat_N = pinv(mat_M) * mat_V;
             
@@ -72,18 +68,21 @@ classdef Arm2D < Arm
             arguments
                 obj
                 ax
+                options.resolution = 20;
                 options.line_options_muscles = obj.line_options_muscles
                 options.line_options_spacers = struct()
                 options.line_options_base_curve = obj.line_options_muscles;
             end
-            initialize_plotting@Arm(obj, ax, "line_options_muscles", options.line_options_muscles);
+            initialize_plotting@Arm(obj, ax, ...
+                "line_options_muscles", options.line_options_muscles, ...
+                "resolution", options.resolution);
             
             obj.v_lh_spacers = matlab.graphics.primitive.Line.empty(0, obj.n_spacers);
             t_spacers = linspace(0, 1, obj.n_spacers);
             for i = 1 : obj.n_spacers
                 obj.v_lh_spacers(i) = line(0, 0, 'color', 'k', options.line_options_spacers);
                 
-                g_o_i = obj.g_o * expm_se2(t_spacers(i) * obj.muscle_o.h_tilde);
+                g_o_i = obj.g_o * se2.expm(t_spacers(i) * obj.muscle_o.h_tilde);
                 g_spacer_i = g_o_i * inv(obj.g_o);
                 
                 plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
@@ -110,7 +109,7 @@ classdef Arm2D < Arm
             
             t_spacers = linspace(0, 1, obj.n_spacers);
             for i = 1 : obj.n_spacers
-                g_o_i = obj.g_o * expm_se2(t_spacers(i) * h_o_tilde);
+                g_o_i = obj.g_o * se2.expm(t_spacers(i) * h_o_tilde);
                 g_spacer_i = g_o_i * inv(obj.g_o);
                 if options.plotting && ~isempty(obj.v_lh_spacers)
                     plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
@@ -120,7 +119,7 @@ classdef Arm2D < Arm
             if options.plotting
                 if obj.plot_base_curve
                     obj.muscle_o.lh.Visible = true;
-                    obj.muscle_o.plot_muscle(obj.ax);
+%                     obj.muscle_o.plot_muscle(obj.ax);
                 else
                     obj.muscle_o.lh.Visible = false;
                 end

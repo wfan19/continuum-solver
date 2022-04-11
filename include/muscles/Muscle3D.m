@@ -46,7 +46,7 @@ classdef Muscle3D < Muscle
             % pose for each point
             for i = 1 : length(t)
                 % Calculate and save the transformation for each point              
-                SE3_pose_i = options.g_offset * obj.g_0 * expm_se3(t(i) * h_tilde);
+                SE3_pose_i = options.g_offset * obj.g_0 * se3.expm(t(i) * h_tilde);
                 positions(i, :) = SE3_pose_i(1:3, 4);
                 orientations(i, :) = rotm2quat(SE3_pose_i(1:3, 1:3));
             end

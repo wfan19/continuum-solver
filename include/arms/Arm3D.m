@@ -20,6 +20,7 @@ classdef Arm3D < Arm
                 g_muscles = {eye(4)}
                 l_0 = 0.3
                 options.plot_unstrained = false
+                options.mat_K = 0;
             end
             
             %%% Create base curve "muscle" for visualization purposes
@@ -36,7 +37,7 @@ classdef Arm3D < Arm
                 g_i = g_muscles{i}; % Muscle pose in world frame
                 g_o_i = g_o_inv * g_i; % Tform from base curve to muscle_i
                 
-                ad_o_i = ad_se3(g_o_i); % Adjoint from base curve to muscle_i
+                ad_o_i = SE3.adjoint(g_o_i); % Adjoint from base curve to muscle_i
                 ad_i_o = inv(ad_o_i); % Adjoint from muscle_i to base curve
                 
                 % Create muscle object
@@ -53,11 +54,16 @@ classdef Arm3D < Arm
             for i = 1 : length(obj.muscles)
                 muscle_i = obj.muscles(i);
                 mat_V(:, i) = muscle_i.adjoint_X_o' * [1; 0; 0; 0; 0; 0];
-                v_k = [1 10 10 0.00025 0.00025 0.00025]';
-                mat_K = diag(v_k);
+                
+                % If mat_K optional parameter not set, make a default one
+                if size(options.mat_K) == 1
+                    k_kappa = 0.00012;
+                    v_k = [1 5 5 0 k_kappa k_kappa]';
+                    options.mat_K = diag(v_k);
+                end
                 mat_M = mat_M + ...
                     muscle_i.adjoint_X_o' * ...
-                    mat_K * ...
+                    options.mat_K * ...
                     muscle_i.adjoint_X_o;
             end
             obj.mat_N = pinv(mat_M) * mat_V;
@@ -93,7 +99,7 @@ classdef Arm3D < Arm
             for i = 1 : obj.n_spacers
                 obj.v_lh_spacers(i) = line(0, 0, 0, 'color', 'k', options.line_options_circles);
                 
-                g_circle = obj.g_o * expm_se3(obj.muscle_o.h_tilde * t_circles(i)) * inv(obj.g_o);
+                g_circle = obj.g_o * se3.expm(obj.muscle_o.h_tilde * t_circles(i)) * inv(obj.g_o);
                 plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             
@@ -112,7 +118,7 @@ classdef Arm3D < Arm
             
             t_circles = linspace(0, 1, obj.n_spacers);
             for i = 1 : length(obj.v_lh_spacers)
-                g_circle = obj.g_o * expm_se3(h_o_tilde * t_circles(i)) * inv(obj.g_o);
+                g_circle = obj.g_o * se3.expm(h_o_tilde * t_circles(i)) * inv(obj.g_o);
                 plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             
@@ -135,7 +141,7 @@ classdef Arm3D < Arm
             theta = linspace(0, 2*pi, n_muscles + 1);
             theta = theta(1:end-1);
             
-            % Yaw of each muscle. Flip to -pi/2 to change chirality
+            % Yaw of each muscle
             yaw_muscles = theta - pi/2;
             
             % Base rotation matrix for all muscles (tilt angle)
@@ -147,7 +153,7 @@ classdef Arm3D < Arm
             for i = 1 : n_muscles
                 t_muscle_i = rho * [0; cos(theta(i)); sin(theta(i))];
                 R_muscle_i = eul2rotm([yaw_muscles(i), 0, 0], 'xyz') * R_muscles;
-                g_muscles{i} = g_o * SE3(R_muscle_i, t_muscle_i);
+                g_muscles{i} = g_o * SE3.hat(R_muscle_i, t_muscle_i);
             end
         end
     end

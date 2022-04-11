@@ -47,7 +47,7 @@ classdef Muscle2D < Muscle
             % pose for each point
             for i = 1 : length(options.t)
                 % Calculate and save the transformation for each point
-                SE2_pose_i = obj.g_0 * expm_se2(options.t(i) * obj.h_tilde);
+                SE2_pose_i = obj.g_0 * se2.expm(options.t(i) * obj.h_tilde);
                 g_out(:, i) = [SE2_pose_i(1, 3); SE2_pose_i(2, 3); atan2(SE2_pose_i(2, 1), SE2_pose_i(1, 1))];
             end
         end

@@ -2,7 +2,7 @@ classdef Arm < handle & matlab.mixin.Copyable
 % Base class for modelling a soft continuum arm constructed of multiple
 % McKibben muscles constrained together by a series of constant/identical
 % separator pieces. 
-% 
+% s
 % Stores the associated Muscle objects that control the overall shape of
 % the McKibben Arm itself, as well as the matrices governing the model 
 % Least Squares problem whose solution determins the forward/inverse
@@ -141,8 +141,10 @@ classdef Arm < handle & matlab.mixin.Copyable
             % Apply copy cstor for all handle children objects
             cp.muscles = copy(obj.muscles);
             cp.muscles_unstrained = copy(obj.muscles_unstrained);
-            cp.v_lh_spacers = copy(obj.v_lh_spacers);
+            
+            if ~isempty(obj.v_lh_spacers)
+                cp.v_lh_spacers = copy(obj.v_lh_spacers);
+            end
         end
     end
 end
-

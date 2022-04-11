@@ -63,7 +63,7 @@ classdef HelicalArm < Arm3D
             R_axis_o = quat2rotm(quat_axis_o');
             
             % Transformation matrix of the helix
-            g_o_helix = SE3(R_axis_o, r_o);
+            g_o_helix = SE3.hat(R_axis_o, r_o);
 
             %%% Offset to transform the helix to g_o
             % It's really g_A' = g_o * inv(g_o_spiral) * exp(h_A)
@@ -102,7 +102,7 @@ classdef HelicalArm < Arm3D
             %%% Plot circles along the arm
             t_circles = linspace(0, 1, obj.n_spacers);
             for i = 1 : length(obj.v_lh_spacers)
-                g_circle = g_offset * obj.g_o * expm_se3(h_o_tilde * t_circles(i)) * inv(obj.g_o);
+                g_circle = g_offset * obj.g_o * se3.expm(h_o_tilde * t_circles(i)) * inv(obj.g_o);
                 plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             
