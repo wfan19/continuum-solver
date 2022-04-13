@@ -8,6 +8,7 @@ classdef Arm2D < Arm
     
     properties
         rho = 0
+        dimension = 2
     end
     
     methods

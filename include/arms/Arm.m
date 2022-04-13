@@ -33,6 +33,10 @@ classdef Arm < handle & matlab.mixin.Copyable
         v_lh_spacers
         n_spacers = 4
     end
+
+    properties (Abstract)
+        dimension
+    end
     
     methods
         % Constructor

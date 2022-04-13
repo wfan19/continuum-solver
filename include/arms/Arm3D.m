@@ -10,6 +10,7 @@ classdef Arm3D < Arm
         rho = 0.02 % Radius of arm
         
         gh_base_curve = 0;
+        dimension = 3;
     end
     
     methods
