@@ -1,4 +1,4 @@
-classdef Arm3D < Arm
+    classdef Arm3D < Arm
 % 3D implementation of a McKibben Arm: A soft continuum robot arm
 % constructed of multiple McKibben muscles constrained together by a series
 % of constant/identical separators that create motion through contracting
@@ -23,7 +23,7 @@ classdef Arm3D < Arm
                 options.plot_unstrained = false
                 options.mat_K = 0;
             end
-            
+
             %%% Create base curve "muscle" for visualization purposes
             obj.g_o = g_o;
             obj.muscle_o = Muscle3D(l_0, 0, "adjoint_X_o", eye(4), "g_0", g_o);
@@ -75,6 +75,10 @@ classdef Arm3D < Arm
             
             % Save the setting
             obj.plot_unstrained = options.plot_unstrained;
+
+            %%% Misc
+            % Calculate default radius value
+            obj.rho = norm(SE3.translation(obj.g_o * inv(g_muscles{1})));
         end
         
         %% Plotting initialization
@@ -84,7 +88,7 @@ classdef Arm3D < Arm
                 ax
                 options.resolution = 20;
                 options.line_options_muscles = struct();
-                options.line_options_circles = struct();
+                options.line_options_spacers = struct();
             end
             % Call superclass plotting initialization
             initialize_plotting@Arm(obj, ax, "line_options_muscles", options.line_options_muscles, ...
@@ -98,7 +102,7 @@ classdef Arm3D < Arm
             
             t_circles = linspace(0, 1, obj.n_spacers);
             for i = 1 : obj.n_spacers
-                obj.v_lh_spacers(i) = line(0, 0, 0, 'color', 'k', options.line_options_circles);
+                obj.v_lh_spacers(i) = line(0, 0, 0, 'color', 'k', options.line_options_spacers);
                 
                 g_circle = obj.g_o * se3.expm(obj.muscle_o.h_tilde * t_circles(i)) * inv(obj.g_o);
                 plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
@@ -119,7 +123,8 @@ classdef Arm3D < Arm
             
             t_circles = linspace(0, 1, obj.n_spacers);
             for i = 1 : length(obj.v_lh_spacers)
-                g_circle = obj.g_o * se3.expm(h_o_tilde * t_circles(i)) * inv(obj.g_o);
+                g_muscle_circle = SE3.hat(eul2rotm([0, pi/2, 0], 'xyz'), [0; 0; 0]);
+                g_circle = obj.g_o * se3.expm(h_o_tilde * t_circles(i)) * g_muscle_circle;
                 plot_circle(obj.v_lh_spacers(i), obj.rho, g_circle);
             end
             

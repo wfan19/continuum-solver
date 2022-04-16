@@ -62,6 +62,10 @@ classdef Arm2D < Arm
             
             % Save the setting
             obj.plot_unstrained = options.plot_unstrained;
+
+            %%% Misc
+            % Calculate default radius value
+            obj.rho = norm(SE2.translation(obj.g_o * inv(g_muscles{1})));
         end
         
         %% Plotting initialization
@@ -111,7 +115,7 @@ classdef Arm2D < Arm
             t_spacers = linspace(0, 1, obj.n_spacers);
             for i = 1 : obj.n_spacers
                 g_o_i = obj.g_o * se2.expm(t_spacers(i) * h_o_tilde);
-                g_spacer_i = g_o_i * inv(obj.g_o);
+                g_spacer_i = g_o_i * SE2.hat([0, 0, pi/2]);
                 if options.plotting && ~isempty(obj.v_lh_spacers)
                     plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
                 end

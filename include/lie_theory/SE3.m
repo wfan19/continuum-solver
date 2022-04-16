@@ -55,6 +55,14 @@ classdef SE3 < GL_n
             ad_out = blkdiag(R, R);
             ad_out(1:3, 4:6) = so3.hat(t) * R;
         end
+
+        function t_out = translation(SE3_in)
+            t_out = SE3_in(1:3, 4);
+        end
+
+        function R_out = rotation(SE3_in)
+            R_out = SE3_in(1:3, 1:3);
+        end
     end
 end
 

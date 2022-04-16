@@ -54,7 +54,15 @@ classdef se2 < gl_n
             SE2_out = eye(3, class(v_se2));
             SE2_out(1:2, 1:2) = R;
             SE2_out(1:2, 3) = V * [vx; vy];
-        end 
+        end
+
+        function v_out = translation(se2_in)
+            v_out = se2_in(1:2, 3);
+        end
+
+        function omega_out = rotation(se2_in)
+            omega_out = se2_in(2, 1);
+        end
     end
 end
 

@@ -43,6 +43,14 @@ classdef SE2 < GL_n
             adj_out(1:2, 1:2) = R;
             adj_out(1:2, 3) = -so2.hat(1) * t(:);
         end
+
+        function t_out = translation(SE2_in)
+            t_out = SE2_in(1:2, 3);
+        end
+
+        function R_out = rotation(SE2_in)
+            R_out = SE2_in(1:2, 1:2);
+        end
     end
 end
 

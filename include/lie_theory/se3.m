@@ -75,6 +75,15 @@ classdef se3 < gl_n
             SE3_out(1:3, 1:3) = so3.expm(omega);
             SE3_out(1:3, 4) = V * vel;
         end
+
+        function v_out = translation(se3_in)
+            v_out = se3_in(1:3, 4);
+        end
+
+        function omega_out = rotation(se3_in)
+            v_se3_in = se3.hat(se3_in);
+            omega_out = v_se3_in(4:6);
+        end
     end
 end
 

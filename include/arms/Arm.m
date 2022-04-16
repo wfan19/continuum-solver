@@ -36,6 +36,7 @@ classdef Arm < handle & matlab.mixin.Copyable
 
     properties (Abstract)
         dimension
+        rho
     end
     
     methods
@@ -81,7 +82,6 @@ classdef Arm < handle & matlab.mixin.Copyable
                 if ~obj.plot_unstrained
                     obj.muscles_unstrained(i).lh.Visible = false;
                 end
-                
             end
         end
         
