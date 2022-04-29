@@ -13,11 +13,12 @@ classdef Arm2D < Arm
     
     methods
         %% Constructor
-        function obj = Arm2D(g_o, g_muscles, l_0, options)
+        function obj = Arm2D(g_o, g_muscles, l_0, mat_K, options)
             arguments
                 g_o (3, 3) double = eye(3)
                 g_muscles = {eye(3)}
                 l_0 = 0.3
+                mat_K = diag([1, 0, 0]);
                 options.plot_unstrained = false
             end
             
@@ -52,7 +53,10 @@ classdef Arm2D < Arm
             for i = 1 : length(obj.muscles)
                 v_i = obj.muscles(i).adjoint_X_o' * [1; 0; 0];
                 mat_V(:, i) = v_i;
-                mat_M = mat_M + v_i * v_i';
+                mat_M = mat_M + ...
+                    obj.muscles(i).adjoint_X_o' * ...
+                    mat_K * ...
+                    obj.muscles(i).adjoint_X_o;
             end
             obj.mat_N = pinv(mat_M) * mat_V;
             
