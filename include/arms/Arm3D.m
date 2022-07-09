@@ -1,4 +1,4 @@
-    classdef Arm3D < Arm
+classdef Arm3D < Arm
 % 3D implementation of a McKibben Arm: A soft continuum robot arm
 % constructed of multiple McKibben muscles constrained together by a series
 % of constant/identical separators that create motion through contracting

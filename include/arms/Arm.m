@@ -104,21 +104,23 @@ classdef Arm < handle & matlab.mixin.Copyable
                 obj.muscles(i).h_tilde = obj.muscles(i).adjoint_X_o * h_o_tilde;
 
                 % Plot muscles
-                obj.muscles(i).plot_muscle(obj.ax);
-                
-                %%% Plot unstrained muscles
-                if obj.plot_unstrained
-                    % Update unstrained muscle's curvature
-                    obj.muscles_unstrained(i).h_tilde = obj.muscles(i).h_tilde;
-                    % Set unstrained muscle's length back to the input length
-                    obj.muscles_unstrained(i).l = v_l(i);
+                if (obj.muscles(i) ~= 0)
+                    obj.muscles(i).plot_muscle(obj.ax);
                     
-                    % Plot unstrained muscles and set visibile
-                    obj.muscles_unstrained(i).plot_muscle(obj.ax);
-                    obj.muscles_unstrained(i).lh.Visible = true;
-                else
-                    % Hide unstrained muscles
-                    obj.muscles_unstrained(i).lh.Visible = false;
+                    %%% Plot unstrained muscles
+                    if obj.plot_unstrained
+                        % Update unstrained muscle's curvature
+                        obj.muscles_unstrained(i).h_tilde = obj.muscles(i).h_tilde;
+                        % Set unstrained muscle's length back to the input length
+                        obj.muscles_unstrained(i).l = v_l(i);
+                        
+                        % Plot unstrained muscles and set visibile
+                        obj.muscles_unstrained(i).plot_muscle(obj.ax);
+                        obj.muscles_unstrained(i).lh.Visible = true;
+                    else
+                        % Hide unstrained muscles
+                        obj.muscles_unstrained(i).lh.Visible = false;
+                    end
                 end
             end
         end
