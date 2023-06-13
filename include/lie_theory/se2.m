@@ -21,7 +21,7 @@ classdef se2 < gl_n
         end
         
         function v_se2_out = vee(se2_in)
-            v_se2_out = zeros(3, 1);
+            v_se2_out = zeros(3, 1, class(se2_in));
 
             v_se2_out(1:2) = se2_in(1:2, 3);
             v_se2_out(3) = se2_in(2, 1);
