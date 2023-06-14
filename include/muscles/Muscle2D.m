@@ -76,6 +76,36 @@ classdef Muscle2D < Muscle
             lh.XData = g_muscle(1, :);
             lh.YData = g_muscle(2, :);
         end
+
+        % Plot the transformation-frames associated with the flow along the
+        % muscle curve, using the plotTransforms function.
+        % Returns `gh` - a handle to a Group object which is associated
+        % with the transforms plotted.
+        function [gh, g_muscle] = plot_tforms(obj, ax, options)
+            arguments
+                obj
+                ax = gca
+                options.g_muscle
+                options.resolution = obj.default_res;
+                options.plot_options = struct(); % Additional keyword-arguments for the plotTransform options
+                options.g_offset = eye(4);
+            end
+            options.plot_options.parent = ax;
+            
+            g_muscle = obj.calc_posns('t', linspace(0, 1, options.resolution));
+            
+            posns_2d = g_muscle(1:2, :);
+            thetas = g_muscle(3, :);
+
+            posns_3d = transpose(vertcat(posns_2d, zeros(1, length(posns_2d))));   % Build list of 3d positions out of our 2d ones
+            euls = horzcat(zeros(length(thetas), 2), thetas(:));        % Build list of 3d euler angles out of our planar thetas
+            quats = eul2quat(euls, "xyz");
+
+            plotTransforms(posns_3d, quats, options.plot_options);
+            
+            gh = ax.Children(1);
+            view(0, 90)
+        end
         
         %% Setter functions
         % Called in Muscle.set.h_tilde
