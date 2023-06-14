@@ -63,7 +63,7 @@ classdef Muscle2D < Muscle
                 options.line_options = struct() % Additional keyword-arguments for the line options
             end
             
-            if lh == 0 % Uninitialized line handle
+            if lh == 0 || (isa(lh, 'matlab.graphics.primitive.Line') && ~isvalid(lh))
                 lh = line(ax, 0, 0, 'color', obj.color, options.line_options);
                 obj.lh = lh;
             end

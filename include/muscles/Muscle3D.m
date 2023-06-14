@@ -66,7 +66,7 @@ classdef Muscle3D < Muscle
                 options.g_offset = eye(4);
             end
             
-            if lh == 0 % Uninitialized line handle
+            if lh == 0 || (isa(lh, 'matlab.graphics.primitive.Line') && ~isvalid(lh)) % Uninitialized line handle
                 lh = line(ax, 0, 0, 0, 'color', obj.color, options.line_options);
                 obj.lh = lh;
             end
