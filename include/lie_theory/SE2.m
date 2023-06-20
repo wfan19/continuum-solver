@@ -51,6 +51,23 @@ classdef SE2 < GL_n
         function R_out = rotation(SE2_in)
             R_out = SE2_in(1:2, 1:2);
         end
+
+        function TeLg = left_lifted_action(SE2_in)
+            % Left lifted action on SE2
+            % AKA the jacobian of a left-action delta_g * g evaluated at g
+            % Formula taken from Geometric Mechanics ver 2022/12/4 pg 151
+            TeLg = eye(3);
+            TeLg(1:2, 1:2) = SE2_in(1:2, 1:2);
+        end
+
+        function TeRg = right_lifted_action(SE2_in)
+            % Right lifted action on SE2
+            % Aka the jacobian of a right-action g * delta_g evaluated at g
+            % Formula taken from GM ver 2022/12/4 pg 167
+            TeRg = eye(3);
+            TeRg(1, 3) = -SE2_in(2, 3);
+            TeRg(2, 3) = SE2_in(1, 3);
+        end
     end
 end
 
