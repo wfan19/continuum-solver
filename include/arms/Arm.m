@@ -89,23 +89,15 @@ classdef Arm < handle & matlab.mixin.Copyable
         % Update arm geometry for a new length-vector - a vector with
         % individual muscle lengths
         % * Generic for both 2D and 3D
-        function h_o_tilde = update_arm(obj, v_l, h_o_tilde)
+        function h_o_tilde = update_arm(obj, h_o_tilde, v_l)
             arguments
                 obj
-                v_l = zeros(length(obj.muscles), 1)
+                h_o_tilde
+                v_l = -1
                 % Calculate new base-curve flow-vector if one is not provided
-                h_o_tilde = obj.f_h_o_tilde(obj, v_l);
             end
             
-            if norm(v_l) > 0
-                obj.muscle_o.h_tilde = h_o_tilde;
-            else
-                h_o_tilde = obj.muscle_o.h_tilde;
-            end
-
-            if ~isvalid(obj.ax)
-                obj.ax = axes();
-            end
+            obj.muscle_o.h_tilde = h_o_tilde;
             
             %%% Calculate and plot individual muscle lengths
             for i = 1 : length(obj.muscles)
@@ -113,13 +105,25 @@ classdef Arm < handle & matlab.mixin.Copyable
 
                 obj.muscles_unstrained(i).h_tilde = obj.muscles(i).h_tilde;
                 % Set unstrained muscle's length back to the input length
-                obj.muscles_unstrained(i).l = v_l(i);
+                if all(v_l > 0)
+                    obj.muscles_unstrained(i).l = v_l(i);
+                end
             end
 
             obj.plot_arm();
         end
 
-        function plot_arm(obj)
+        function plot_arm(obj, ax)
+            arguments
+                obj
+                ax = gca;
+            end
+            % Reinitialize the plot if the axes have been deleted.
+
+            if obj.ax == 0 || ~isvalid(obj.ax)
+                obj.initialize_plotting(ax)
+            end
+
             % Plot muscles
             for i = 1 : length(obj.muscles)
                 if (obj.muscles(i) ~= 0)
@@ -138,6 +142,12 @@ classdef Arm < handle & matlab.mixin.Copyable
                     end
                 end
             end
+        end
+
+        function solve_statics(obj, v_l)
+            % TODO: support other scenarios for the statics!
+            h_o_tilde = obj.f_h_o_tilde_default(v_l);
+            obj.update_arm(h_o_tilde);
         end
         
         %% Default base-curve flow-vector calculation function
