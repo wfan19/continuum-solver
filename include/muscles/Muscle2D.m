@@ -64,6 +64,9 @@ classdef Muscle2D < Muscle
             end
             
             if lh == 0 || (isa(lh, 'matlab.graphics.primitive.Line') && ~isvalid(lh))
+                if ~isvalid(ax)
+                    ax = axes();
+                end
                 lh = line(ax, 0, 0, 'color', obj.color, options.line_options);
                 obj.lh = lh;
             end

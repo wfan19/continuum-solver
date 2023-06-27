@@ -52,6 +52,7 @@ classdef Muscle < handle & matlab.mixin.Copyable
         
         % Setters for l and kappa 
         function set.l(obj, l)
+            assert(l ~= 0, "Length of rod cannot be zero")
             obj.l = l;
             % Update h_tilde accordingly
             obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
@@ -66,6 +67,7 @@ classdef Muscle < handle & matlab.mixin.Copyable
         % Function that updates kappa and l values based on an updated
         % h_tilde value
         function set.h_tilde(obj, h_tilde)
+            assert(h_tilde(1) ~= 0, "Length in h_tilde cannot be zero")
             obj.h_tilde = h_tilde;
             
             % Update l

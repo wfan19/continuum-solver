@@ -92,34 +92,49 @@ classdef Arm < handle & matlab.mixin.Copyable
         function h_o_tilde = update_arm(obj, v_l, h_o_tilde)
             arguments
                 obj
-                v_l
+                v_l = zeros(length(obj.muscles), 1)
                 % Calculate new base-curve flow-vector if one is not provided
                 h_o_tilde = obj.f_h_o_tilde(obj, v_l);
             end
             
-            obj.muscle_o.h_tilde = h_o_tilde;
+            if norm(v_l) > 0
+                obj.muscle_o.h_tilde = h_o_tilde;
+            else
+                h_o_tilde = obj.muscle_o.h_tilde;
+            end
+
+            if ~isvalid(obj.ax)
+                obj.ax = axes();
+            end
             
             %%% Calculate and plot individual muscle lengths
             for i = 1 : length(obj.muscles)
                 obj.muscles(i).h_tilde = obj.muscles(i).adjoint_X_o * h_o_tilde;
 
-                % Plot muscles
+                obj.muscles_unstrained(i).h_tilde = obj.muscles(i).h_tilde;
+                % Set unstrained muscle's length back to the input length
+                obj.muscles_unstrained(i).l = v_l(i);
+            end
+
+            obj.plot_arm();
+        end
+
+        function plot_arm(obj)
+            % Plot muscles
+            for i = 1 : length(obj.muscles)
                 if (obj.muscles(i) ~= 0)
                     obj.muscles(i).plot_muscle(obj.ax);
                     
                     %%% Plot unstrained muscles
-                    if obj.plot_unstrained
-                        % Update unstrained muscle's curvature
-                        obj.muscles_unstrained(i).h_tilde = obj.muscles(i).h_tilde;
-                        % Set unstrained muscle's length back to the input length
-                        obj.muscles_unstrained(i).l = v_l(i);
-                        
+                    if obj.plot_unstrained                        
                         % Plot unstrained muscles and set visibile
                         obj.muscles_unstrained(i).plot_muscle(obj.ax);
                         obj.muscles_unstrained(i).lh.Visible = true;
                     else
                         % Hide unstrained muscles
-                        obj.muscles_unstrained(i).lh.Visible = false;
+                        if isvalid(obj.muscles_unstrained(i).lh)
+                            obj.muscles_unstrained(i).lh.Visible = false;
+                        end
                     end
                 end
             end

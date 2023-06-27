@@ -109,28 +109,28 @@ classdef Arm2D < Arm
         function h_o_tilde = update_arm(obj, v_l, h_o_tilde, options)
             arguments
                 obj
-                v_l
+                v_l = zeros(length(obj.muscles), 1);
                 % Calculate new base-curve flow-vector if one is not provided
                 h_o_tilde = obj.f_h_o_tilde(obj, v_l);
                 options.plotting = true;
             end
             update_arm@Arm(obj, v_l, h_o_tilde);
             
-            t_spacers = linspace(0, 1, obj.n_spacers);
-            for i = 1 : obj.n_spacers
-                g_o_i = obj.g_o * se2.expm(t_spacers(i) * h_o_tilde);
-                g_spacer_i = g_o_i * SE2.hat([0, 0, pi/2]);
-                if options.plotting && ~isempty(obj.v_lh_spacers)
-                    plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
-                end
-            end
-            
             if options.plotting
-                if obj.plot_base_curve
-                    obj.muscle_o.lh.Visible = true;
-%                     obj.muscle_o.plot_muscle(obj.ax);
-                else
-                    obj.muscle_o.lh.Visible = false;
+                obj.plot_arm();
+            end
+        end
+
+        function plot_arm(obj)
+            plot_arm@Arm(obj);
+            obj.muscle_o.lh.Visible = obj.plot_base_curve;
+
+            if ~isempty(obj.v_lh_spacers)
+                t_spacers = linspace(0, 1, obj.n_spacers);
+                for i = 1 : obj.n_spacers
+                    g_o_i = obj.g_o * se2.expm(t_spacers(i) * obj.muscle_o.h_tilde);
+                    g_spacer_i = g_o_i * SE2.hat([0, 0, pi/2]);
+                    plot_spacer(obj.v_lh_spacers(i), obj.rho, g_spacer_i);
                 end
             end
         end
