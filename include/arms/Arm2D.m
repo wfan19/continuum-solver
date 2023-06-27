@@ -79,7 +79,7 @@ classdef Arm2D < Arm
                 ax
                 options.resolution = 20;
                 options.line_options_muscles = obj.line_options_muscles
-                options.line_options_spacers = struct()
+                options.line_options_spacers = obj.line_options_muscles
                 options.line_options_base_curve = obj.line_options_muscles;
             end
             initialize_plotting@Arm(obj, ax, ...

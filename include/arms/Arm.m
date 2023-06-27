@@ -22,7 +22,7 @@ classdef Arm < handle & matlab.mixin.Copyable
         
         ax = 0 % Plotting axes
         
-        line_options_muscles = struct()
+        line_options_muscles = struct("linewidth", 2.5)
         
         plot_unstrained = false
         
