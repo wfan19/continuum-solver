@@ -32,7 +32,7 @@ classdef Muscle2D < Muscle
             arguments
                 obj
                 h_tilde = obj.h_tilde; % Flow vector
-                options.t = 1; % Array of points along the curve for the poses to be calculated at (0 - 1, percentage).
+                options.t = obj.max_s; % Array of points along the curve for the poses to be calculated at (0 - 1, percentage).
             end
             
             % Update object's flow-vector if the input flow-vector isn't
@@ -71,7 +71,7 @@ classdef Muscle2D < Muscle
                 obj.lh = lh;
             end
             
-            g_muscle = obj.calc_posns('t', linspace(0, 1, options.resolution));
+            g_muscle = obj.calc_posns('t', linspace(0, obj.max_s, options.resolution));
             if ax ~= lh.Parent
                 lh.Parent = ax;
             end

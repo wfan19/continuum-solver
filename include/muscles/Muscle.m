@@ -16,6 +16,9 @@ classdef Muscle < handle & matlab.mixin.Copyable
         
         % Length (meters) of muscle
         l = 0.1
+
+        % Default s bound
+        max_s = 1;
         
         % Curvature of muscle
         kappa
