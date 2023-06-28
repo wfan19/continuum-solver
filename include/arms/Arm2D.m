@@ -106,22 +106,6 @@ classdef Arm2D < Arm
                 obj.muscle_o.lh.Visible = false;
             end
         end
-        
-        %% Calculate and plot new arm geometry given new length vector
-        function h_o_tilde = update_arm(obj, h_o_tilde, v_l, options)
-            arguments
-                obj
-                % Calculate new base-curve flow-vector if one is not provided
-                h_o_tilde
-                v_l = -1;
-                options.plotting = true;
-            end
-            update_arm@Arm(obj, h_o_tilde, v_l);
-            
-            if options.plotting
-                obj.plot_arm();
-            end
-        end
 
         function plot_arm(obj, ax)
             arguments
