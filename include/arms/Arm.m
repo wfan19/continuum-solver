@@ -17,7 +17,8 @@ classdef Arm < handle & matlab.mixin.Copyable
         
         g_o % Base frame transformation
         muscle_o % Base muscle
-        
+        g_o_muscles % Transform from base muscle to individual muscles
+
         mat_N
         
         ax = 0 % Plotting axes

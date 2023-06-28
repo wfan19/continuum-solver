@@ -13,34 +13,36 @@ classdef Arm2D < Arm
     
     methods
         %% Constructor
-        function obj = Arm2D(g_o, g_muscles, l_0, mat_K, options)
+        function obj = Arm2D(g_o, g_o_muscles, l_0, mat_K, options)
             arguments
                 g_o (3, 3) double = eye(3)
-                g_muscles = {eye(3)}
+                g_o_muscles = {eye(3)}
                 l_0 = 0.3
                 mat_K = diag([1, 0, 0]);
                 options.plot_unstrained = false
             end
-            
-            %%% Create base curve "muscle" for visualization purposes
+
             obj.g_o = g_o;
+            obj.g_o_muscles = g_o_muscles;
+
+            %%% Create base curve "muscle" for visualization purposes
             obj.muscle_o = Muscle2D(l_0, 0, "adjoint_X_o", eye(3), "g_0", g_o);
             
             %%% Preallocate muscle arrays
-            obj.muscles = Muscle2D.empty(0, length(g_muscles));
+            obj.muscles = Muscle2D.empty(0, length(g_o_muscles));
             
             %%% Create individual muscle objects
-            g_o_inv = inv(g_o);
-            hues = linspace(0, 240/360, length(g_muscles)); % Colors, gradient from red -> green -> blue
-            for i = 1 : length(g_muscles)
-                g_i = g_muscles{i}; % Muscle pose in world frame
-                g_o_i = g_o_inv * g_i; % Tform from base curve to muscle_i
+            hues = linspace(0, 240/360, length(g_o_muscles)); % Colors, gradient from red -> green -> blue
+            for i = 1 : length(g_o_muscles)
+                g_o_i = g_o_muscles{i};
+                g_0_i = g_o * g_o_muscles{i};
                 
                 ad_o_i = SE2.adjoint(g_o_i); % Adjoint from base curve to muscle_i
                 ad_i_o = inv(ad_o_i); % Adjoint from muscle_i to base curve
                 
                 % Create muscle object
-                obj.muscles(i) = Muscle2D(l_0, 0, "adjoint_X_o", ad_i_o, "g_0", g_i);
+                obj.muscles(i) = Muscle2D(l_0, 0, "adjoint_X_o", ad_i_o, "g_0", g_0_i);
+                obj.muscles(i).g_o_i = g_o_i;
                 
                 % Assign colors
                 obj.muscles(i).color = hsv2rgb([hues(i), 1, 1]);    
@@ -69,7 +71,7 @@ classdef Arm2D < Arm
 
             %%% Misc
             % Calculate default radius value
-            obj.rho = norm(SE2.translation(obj.g_o * inv(g_muscles{1})));
+            obj.rho = norm(SE2.translation(g_o_muscles{1}));
         end
         
         %% Plotting initialization
@@ -122,6 +124,10 @@ classdef Arm2D < Arm
         end
 
         function plot_arm(obj, ax)
+            arguments
+                obj
+                ax = gca
+            end
             plot_arm@Arm(obj, ax);
             obj.muscle_o.lh.Visible = obj.plot_base_curve;
 

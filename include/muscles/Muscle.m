@@ -6,9 +6,11 @@ classdef Muscle < handle & matlab.mixin.Copyable
 
     %% Properties
     properties
-        % Transform from base curve's frame to muscle base's frame (x = forward)
+        % Pose of muscle in world frame
         g_0
         
+        g_o_i % Transform from base curve frame to muscle base's frame
+
         % Adjoint matrix from self to base-curve
         adjoint_X_o
         
