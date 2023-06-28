@@ -120,7 +120,7 @@ classdef Arm < handle & matlab.mixin.Copyable
             end
             % Reinitialize the plot if the lines have been deleted.
             if obj.ax == 0 || ~isvalid(obj.muscle_o.lh)
-                obj.initialize_plotting(ax)
+                obj.initialize_plotting(ax);
             end
 
             % Plot muscles
