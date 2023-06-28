@@ -116,7 +116,8 @@ classdef Arm2D < Arm
             obj.muscle_o.lh.Visible = obj.plot_base_curve;
 
             if ~isempty(obj.v_lh_spacers)
-                t_spacers = linspace(0, 1, obj.n_spacers);
+                max_s = obj.muscle_o.max_s;
+                t_spacers = linspace(0, max_s, obj.n_spacers);
                 for i = 1 : obj.n_spacers
                     g_o_i = obj.g_o * se2.expm(t_spacers(i) * obj.muscle_o.h_tilde);
                     g_spacer_i = g_o_i * SE2.hat([0, 0, pi/2]);
