@@ -179,7 +179,7 @@ classdef Arm < handle & matlab.mixin.Copyable
             cp.muscle_o = copy(obj.muscle_o);
             cp.muscles_unstrained = copy(obj.muscles_unstrained);
             
-            if ~isempty(obj.v_lh_spacers)
+            if ~isempty(obj.v_lh_spacers) && isvalid(obj.v_lh_spacers(1))
                 cp.v_lh_spacers = copy(obj.v_lh_spacers);
             end
         end
