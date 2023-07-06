@@ -116,14 +116,15 @@ classdef Arm < handle & matlab.mixin.Copyable
         function plot_arm(obj, ax)
             arguments
                 obj
-                ax = gca;
+                ax = 0;
             end
-            % Reinitialize the plot if the lines have been deleted.
-            if obj.ax == 0 || ~isvalid(obj.muscle_o.lh)
+            % Reinitialize the plot if the lines have been deleted or if an
+            % axis is provided
+            if ax ~= 0 || obj.ax == 0 || ~isvalid(obj.muscle_o.lh)
                 obj.initialize_plotting(ax);
             end
 
-            % Plot muscles
+            % Otherwise, plot the muscles on the existing axis
             for i = 1 : length(obj.muscles)
                 if (obj.muscles(i) ~= 0)
                     obj.muscles(i).plot_muscle(obj.ax);
