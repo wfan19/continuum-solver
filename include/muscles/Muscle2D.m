@@ -57,24 +57,20 @@ classdef Muscle2D < Muscle
         function [lh, obj] = plot_muscle(obj, ax, lh, options)
             arguments
                 obj
-                ax = gca()
+                ax
                 lh = obj.lh;
                 options.resolution = obj.default_res;
                 options.line_options = struct() % Additional keyword-arguments for the line options
             end
             
             if lh == 0 || (isa(lh, 'matlab.graphics.primitive.Line') && ~isvalid(lh))
-                if ~isvalid(ax)
-                    ax = axes();
-                end
+                % Create a new line handle if the line handle is currently
+                % invalid
                 lh = line(ax, 0, 0, 'color', obj.color, options.line_options);
                 obj.lh = lh;
             end
             
             g_muscle = obj.calc_posns('t', linspace(0, obj.max_s, options.resolution));
-            if ax ~= lh.Parent
-                lh.Parent = ax;
-            end
             
             lh.XData = g_muscle(1, :);
             lh.YData = g_muscle(2, :);

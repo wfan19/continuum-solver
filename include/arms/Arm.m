@@ -55,8 +55,8 @@ classdef Arm < handle & matlab.mixin.Copyable
             
             obj.ax = ax;
             
-            axis(ax, 'equal');
-            grid(ax, 'on');
+            axis(ax, "equal");
+            grid(ax, "on");
             xlabel(ax, "X");
             ylabel(ax, "Y");
             
