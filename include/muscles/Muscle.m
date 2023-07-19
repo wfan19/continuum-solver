@@ -13,7 +13,7 @@ classdef Muscle < handle & matlab.mixin.Copyable
         
         % Flow vector storage: components vs whole
         g_circ_right    % Flow vector of muscle
-        l = 0.1    % Length of muscle
+        l = 1    % Length of muscle
         true_shear           % Shear of muscle
         true_curvature       % Curvature of muscle
 
@@ -25,8 +25,9 @@ classdef Muscle < handle & matlab.mixin.Copyable
     %% Methods
     methods
         %% Constructor
-        function obj = Muscle(group, l)
+        function obj = Muscle(group, g_0, l)
             obj.group = group;
+            obj.g_0 = g_0;
 
             %%% Populate default values based on the group dimensionality
             mat_e = zeros(group.algebra.mat_size);
@@ -36,11 +37,6 @@ classdef Muscle < handle & matlab.mixin.Copyable
             obj.true_curvature = e_rotation;
 
             obj.l = l;
-            
-            % Create the default g_circ_right vector
-%             g_circ_right = group.algebra.hat(mat_e);
-%             g_circ_right(1) = l;
-%             obj.g_circ_right = g_circ_right;
         end
 
         %% Member functions
@@ -64,7 +60,7 @@ classdef Muscle < handle & matlab.mixin.Copyable
             % pose for each point
             for i = 1 : length(options.t)
                 % Calculate and save the transformation for each point
-                pose_i = obj.g_0 * obj.group.algebra.expm(options.t(i) * obj.h_tilde);
+                pose_i = obj.g_0 * obj.group.algebra.expm(options.t(i) * obj.g_circ_right);
                 g_out(:, i) = obj.group.vee(pose_i);
             end
         end

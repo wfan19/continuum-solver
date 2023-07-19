@@ -30,7 +30,7 @@ classdef SE3 < GL_n
             t = mat_SE3(1:3, 4);
             R = mat_SE3(1:3, 1:3);
             eul = rotm2eul(R,"xyz");
-            v_SE3_out = [t; eul];
+            v_SE3_out = [t(:); eul(:)];
         end
         
         %% SE3 Logm
