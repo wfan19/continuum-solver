@@ -28,7 +28,10 @@ classdef SE3 < GL_n
         
         function v_SE3_out = vee(mat_SE3)
             % To be implemented
-            v_SE3_out = zeros(6, 1);
+            t = mat_SE3(1:3, 4);
+            R = mat_SE3(1:3, 1:3);
+            q = rotm2quat(R);
+            v_SE3_out = [t; q];
         end
         
         %% SE3 Logm

@@ -63,6 +63,14 @@ classdef se2 < gl_n
         function omega_out = rotation(se2_in)
             omega_out = se2_in(2, 1);
         end
+
+        function v_out = v_translation(v_se2_in)
+            v_out = v_se2_in(1:2);
+        end
+
+        function omega_out = v_rotation(v_se2_in)
+            omega_out = v_se2_in(3);
+        end
     end
 end
 

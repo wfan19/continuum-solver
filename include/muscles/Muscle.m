@@ -6,48 +6,34 @@ classdef Muscle < handle & matlab.mixin.Copyable
 
     %% Properties
     properties
-        % Pose of muscle in world frame
-        g_0
-        
-        g_o_i % Transform from base curve frame to muscle base's frame
+        group           % Embedding Lie group
 
-        % Adjoint matrix from self to base-curve
-        adjoint_X_o
+        g_0             % Pose of muscle in world frame
+        max_s = 1       % Default s bound
         
-        % Length (meters) of muscle
-        l = 0.1
+        % Flow vector storage: components vs whole
+        g_circ_right    % Flow vector of muscle
+        length = 0.1    % Length of muscle
+        true_shear           % Shear of muscle
+        true_curvature       % Curvature of muscle
 
-        % Default s bound
-        max_s = 1;
-        
-        % Curvature of muscle
-        kappa
-        
-        % Flow vector of muscle
-        h_tilde
-        
-        % Plotting resolution
-        default_res = 20;
-        
-        color = 'k'
-        
-        % Line handle attached to muscle
-        lh = 0 % Default value for uninitialized linehandle
+        % Components - TODO: Should these be mixins instead?
+        mechanics       % Mechanics model
+        plotter         % Plotting module: 2D or 3D
     end
     
     %% Methods
     methods
         %% Constructor
-        function obj = Muscle(l, kappa, options)
-            arguments
-                l
-                kappa
-                options.color = 'k'
-            end
-            
-            obj.kappa = kappa;
-            obj.l = l;
-            obj.color = options.color;
+        function obj = Muscle(length, curvature)
+            obj.true_curvature = curvature;
+            obj.length = length;
+        end
+
+        %% Member functions
+        % Calculate position(s) along the curve
+        function [g_out, obj] = calc_posns(obj, g_circ_right, options)
+            obj.group
         end
         
         %% Setters
@@ -56,53 +42,45 @@ classdef Muscle < handle & matlab.mixin.Copyable
         % updates the others.
         
         % Setters for l and kappa 
-        function set.l(obj, l)
-            assert(l ~= 0, "Length of rod cannot be zero")
-            obj.l = l;
+        function set.length(obj, length)
+            assert(length ~= 0, "Length of rod cannot be zero")
+            obj.length = length;
             % Update h_tilde accordingly
-            obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
+            obj.g_circ_right = obj.length * [1; obj.true_shear; obj.true_curvature];
         end
         
-        function set.kappa(obj, kappa)
-            obj.kappa = kappa;
+        function set.true_curvature(obj, curvature)
+            obj.true_curvature = curvature;
             % Update h_tilde accordingly
-            obj.h_tilde = obj.l * [1; obj.gamma; obj.kappa];
+            obj.g_circ_right = obj.length * [1; obj.true_shear; obj.true_curvature];
         end
         
         % Function that updates kappa and l values based on an updated
         % h_tilde value
-        function set.h_tilde(obj, h_tilde)
-            assert(h_tilde(1) ~= 0, "Length in h_tilde cannot be zero")
-            obj.h_tilde = h_tilde;
+        function set.g_circ_right(obj, g_circ_right)
+            assert(g_circ_right(1) ~= 0, "Length in g_circ_right cannot be zero") % THis breaks the safeguards
+            obj.g_circ_right = g_circ_right;
             
             % Update l
-            % Safeguard to prevent infinite looping
-            if obj.l ~= h_tilde(1)
-                obj.l = h_tilde(1);
+            new_l = g_circ_right(1);
+            if obj.length ~= new_l  % Only set new val if not already set to prevent infinite loop
+                obj.length = new_l;
+            end
+
+            v = obj.group.algebra.v_translation(g_circ_right);
+            omega = obj.group.algera.v_rotation(g_circ_right);
+
+            new_shear = v(2:end) / new_l;
+            new_curvature = omega / new_l;
+
+            % Only set new val if not already set to prevent infinite loop
+            if any(obj.true_shear ~= new_shear) 
+                obj.true_shear = new_shear;
             end
             
-            % Update gamma and kappa (implementation specific)
-            obj.update_gamma_kappa(h_tilde);
-
-        end
-        
-        function set.color(obj, color)
-            obj.color = color;
-            if class(obj.lh) ~= "double" % If line handle has been initialized
-                obj.lh.Color = color;
+            if any(obj.true_curvature ~= new_curvature)
+                obj.true_curvature = new_curvature;
             end
-        end
-        
-        %% Member functions
-        % To be implemented in subclasses
-        
-        % Calculate position(s) along the curve
-        function [g_out, obj] = calc_posns(obj, h_tilde, options)
-        end
-        
-        % Plot the current muscle curve on the given line handle. If a
-        % line handle is not provided, create a new one on the current axis
-        function [lh, obj] = plot_muscle(obj, ax, lh, options)
         end
     end
     
