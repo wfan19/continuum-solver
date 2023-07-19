@@ -13,7 +13,7 @@ classdef Muscle < handle & matlab.mixin.Copyable
         
         % Flow vector storage: components vs whole
         g_circ_right    % Flow vector of muscle
-        length = 0.1    % Length of muscle
+        l = 0.1    % Length of muscle
         true_shear           % Shear of muscle
         true_curvature       % Curvature of muscle
 
@@ -25,15 +25,48 @@ classdef Muscle < handle & matlab.mixin.Copyable
     %% Methods
     methods
         %% Constructor
-        function obj = Muscle(length, curvature)
-            obj.true_curvature = curvature;
-            obj.length = length;
+        function obj = Muscle(group, l)
+            obj.group = group;
+
+            %%% Populate default values based on the group dimensionality
+            mat_e = zeros(group.algebra.mat_size);
+            e_translation = group.algebra.translation(mat_e);
+            e_rotation = group.algebra.rotation(mat_e);
+            obj.true_shear = e_translation(2:end);
+            obj.true_curvature = e_rotation;
+
+            obj.l = l;
+            
+            % Create the default g_circ_right vector
+%             g_circ_right = group.algebra.hat(mat_e);
+%             g_circ_right(1) = l;
+%             obj.g_circ_right = g_circ_right;
         end
 
         %% Member functions
         % Calculate position(s) along the curve
         function [g_out, obj] = calc_posns(obj, g_circ_right, options)
-            obj.group
+            arguments
+                obj
+                g_circ_right = obj.g_circ_right; % Flow vector
+                options.t = obj.max_s; % Array of points along the curve for the poses to be calculated at (0 - 1, percentage).
+            end
+                        
+            % Update object's flow-vector if the input flow-vector isn't
+            % the one currently stored
+            if g_circ_right ~= obj.g_circ_right
+                obj.g_circ_right = g_circ_right;
+            end
+            
+            g_out = zeros(obj.group.dof, length(options.t));
+
+            % Loop through points along the curve (t) and calculate the
+            % pose for each point
+            for i = 1 : length(options.t)
+                % Calculate and save the transformation for each point
+                pose_i = obj.g_0 * obj.group.algebra.expm(options.t(i) * obj.h_tilde);
+                g_out(:, i) = obj.group.vee(pose_i);
+            end
         end
         
         %% Setters
@@ -42,17 +75,17 @@ classdef Muscle < handle & matlab.mixin.Copyable
         % updates the others.
         
         % Setters for l and kappa 
-        function set.length(obj, length)
-            assert(length ~= 0, "Length of rod cannot be zero")
-            obj.length = length;
+        function set.l(obj, l)
+            assert(l ~= 0, "Length of rod cannot be zero")
+            obj.l = l;
             % Update h_tilde accordingly
-            obj.g_circ_right = obj.length * [1; obj.true_shear; obj.true_curvature];
+            obj.g_circ_right = obj.l * [1; obj.true_shear; obj.true_curvature];
         end
         
         function set.true_curvature(obj, curvature)
             obj.true_curvature = curvature;
             % Update h_tilde accordingly
-            obj.g_circ_right = obj.length * [1; obj.true_shear; obj.true_curvature];
+            obj.g_circ_right = obj.l * [1; obj.true_shear; obj.true_curvature];
         end
         
         % Function that updates kappa and l values based on an updated
@@ -63,12 +96,12 @@ classdef Muscle < handle & matlab.mixin.Copyable
             
             % Update l
             new_l = g_circ_right(1);
-            if obj.length ~= new_l  % Only set new val if not already set to prevent infinite loop
-                obj.length = new_l;
+            if obj.l ~= new_l  % Only set new val if not already set to prevent infinite loop
+                obj.l = new_l;
             end
 
             v = obj.group.algebra.v_translation(g_circ_right);
-            omega = obj.group.algera.v_rotation(g_circ_right);
+            omega = obj.group.algebra.v_rotation(g_circ_right);
 
             new_shear = v(2:end) / new_l;
             new_curvature = omega / new_l;
@@ -80,23 +113,6 @@ classdef Muscle < handle & matlab.mixin.Copyable
             
             if any(obj.true_curvature ~= new_curvature)
                 obj.true_curvature = new_curvature;
-            end
-        end
-    end
-    
-    % Copy constructor
-    methods (Access = protected)
-        
-        % Copy constructor
-        % Inherited from matlab.mixin.Copyable
-        function cp = copyElement(obj)
-            % Regular copy of all elements
-            cp = copyElement@matlab.mixin.Copyable(obj);
-            
-            % Copy value of line-handle if initialized
-            if obj.lh ~= 0 && isvalid(obj.lh)
-                cp.lh = copy(obj.lh);
-                cp.lh.Parent = obj.lh.Parent;
             end
         end
     end

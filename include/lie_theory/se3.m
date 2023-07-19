@@ -78,20 +78,22 @@ classdef se3 < gl_n
 
         function v_out = translation(se3_in)
             v_se3_in = se3.vee(se3_in);
-            v_out = v_translation(v_se3_in);
+            v_out = se3.v_translation(v_se3_in);
         end
 
         function omega_out = rotation(se3_in)
             v_se3_in = se3.vee(se3_in);
-            omega_out = v_rotation(v_se3_in);
+            omega_out = se3.v_rotation(v_se3_in);
         end
 
         function v_out = v_translation(v_se3_in)
             v_out = v_se3_in(1:3);
+            v_out = v_out(:);
         end
 
         function omega_out = v_rotation(v_se3_in)
             omega_out = v_se3_in(4:6);
+            omega_out = omega_out(:);
         end
     end
 end
