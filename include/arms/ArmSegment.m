@@ -12,16 +12,16 @@ classdef ArmSegment < handle & matlab.mixin.Copyable
     methods
         function obj = ArmSegment(group, g_o, g_o_rods, l)
             obj.group = group;              % Store the embedding group
-            obj.rod_o = Rod(group, l, g_o); % Rod representing the base curve
-            obj.rods = Rod.empty(0, length(g_o_rods));  % List of all actual rods
+            obj.rod_o = RodSegment(group, l, g_o); % Rod representing the base curve
+            obj.rods = RodSegment.empty(0, length(g_o_rods));  % List of all actual rods
             obj.adjoints = cell(1, length(g_o_rods));   % Store the list of adjoint matrices for computation.
 
             % Create the rods
             for i = 1 : length(g_o_rods)
-                adjoint_i_o = obj.group.Adjoint(g_o_rods{i});
+                adjoint_i_o = obj.group.adjoint(g_o_rods{i});
                 g_0_i = g_o * g_o_rods{i};
 
-                obj.rods(i) = Rod(group, l, g_0_i);
+                obj.rods(i) = RodSegment(group, l, g_0_i);
                 obj.adjoints{i} = adjoint_i_o;
             end
         end

@@ -43,7 +43,7 @@ end
 %% Kinematics
 % Set and retrieve the base curve
 function test_set_get_base_curve(testCase)
-    print("not yet implemented")
+    disp("not yet implemented")
     verifyEqual(testCase, 1, 1);
 end
 

@@ -1,4 +1,4 @@
-classdef Rod < handle & matlab.mixin.Copyable
+classdef RodSegment < handle & matlab.mixin.Copyable
 % General Rod class
 % - Stores and manages the twist-vector
 % - Coordinate free pose integration
@@ -26,7 +26,7 @@ classdef Rod < handle & matlab.mixin.Copyable
     %% Methods
     methods
         %% Constructor
-        function obj = Rod(group, l, g_0)
+        function obj = RodSegment(group, l, g_0)
             arguments
                 group
                 l

@@ -1,4 +1,4 @@
-function tests = test_muscle
+function tests = test_rod
     tests = functiontests(localfunctions);
 end
 
@@ -8,8 +8,8 @@ function setup(testCase)
     l_0 = 1;
     testCase.TestData.l_0 = l_0;
 
-    testCase.TestData.rod2d = Rod(SE2, l_0);
-    testCase.TestData.rod3d = Rod(SE3, l_0);
+    testCase.TestData.rod2d = RodSegment(SE2, l_0);
+    testCase.TestData.rod3d = RodSegment(SE3, l_0);
 
     g_0_2d = SE2.hat([-1; 2; -3]);
     g_0_3d = SE3.hat(eul2rotm([0, -pi, 0], "xyz"), [-1; -2; -3]);
@@ -81,7 +81,7 @@ function test_copy(testCase)
     rod2d_2 = copy(testCase.TestData.rod2d);
     rod2d_2.l = 2;
 
-    verifyEqual(testCase, testCase.TestData.muscle2d.l, 1);
+    verifyEqual(testCase, testCase.TestData.rod2d.l, 1);
     verifyEqual(testCase, rod2d_2.l, 2);
 end
 
