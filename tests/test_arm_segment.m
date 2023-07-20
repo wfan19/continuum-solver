@@ -49,7 +49,13 @@ end
 
 % Test retrieving the strains of each muscle, based on the base-curve
 function test_get_strains(testCase)
-    
+    arm = testCase.TestData.arm_2d;
+    arm.set_base_curve([1; 0; 2]);
+    strains = arm.get_strains();
+
+    % I don't have the exact values, so we'll just make sure it's curving
+    % in the right direction.
+    verifyLessThan(testCase, strains(1), strains(2))
 end
 
 function test_get_forces(testCase)

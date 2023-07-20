@@ -19,7 +19,7 @@ classdef RodSegment < handle & matlab.mixin.Copyable
         true_curvature       % Curvature of muscle
 
         % Components - TODO: Should these be mixins instead?
-        mechanics       % Mechanics model
+        mechanics = RodMechanicsBase()       % Mechanics model
         plotter         % Plotting module: 2D or 3D
     end
     
@@ -48,6 +48,7 @@ classdef RodSegment < handle & matlab.mixin.Copyable
             obj.true_curvature = e_rotation;
 
             obj.l = l;
+            obj.mechanics.l_0 = l;
         end
 
         %% Member functions
