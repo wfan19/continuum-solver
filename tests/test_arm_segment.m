@@ -3,7 +3,7 @@ function tests = test_arm_segment
 end
 
 function setup(testCase)
-    %%% Build a simple 2-muscle 2D arm
+    % Build a simple 2-muscle 2D arm
     N_segments = 5;
     l_0 = 0.5;
     rho = 0.0254;
@@ -32,9 +32,28 @@ function test_construction_2d(testCase)
 end
 
 function test_copy(testCase)
+    % Create a copy arm and change one of its properties
     arm_copy = copy(testCase.TestData.arm_2d);
-
     arm_copy.rod_o.l = 2;
 
+    % Verify that the property is unchanged on the original arm
     verifyEqual(testCase, testCase.TestData.arm_2d.rod_o.l, testCase.TestData.l_0);
 end
+
+%% Kinematics
+% Set and retrieve the base curve
+function test_set_get_base_curve(testCase)
+    print("not yet implemented")
+    verifyEqual(testCase, 1, 1);
+end
+
+% Test retrieving the strains of each muscle, based on the base-curve
+function test_get_strains(testCase)
+    
+end
+
+function test_get_forces(testCase)
+
+end
+
+%% Mechanics
