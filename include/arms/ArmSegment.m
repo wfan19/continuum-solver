@@ -1,40 +1,53 @@
 classdef ArmSegment < handle & matlab.mixin.Copyable
     % A constant cross-section arm segment.
-    
     properties
-        group 
-        rod_o
-        rods
+        group   % Group that all arm geometry is defined in
+        rod_o   % Rod representing the base-curve
+        rods    % List of rods composing the continuum arm
+
+        % Supporting variables (could be private?)
+        adjoints;
     end
     
     methods
         function obj = ArmSegment(group, g_o, g_o_rods, l)
-            obj.group = group;
+            obj.group = group;              % Store the embedding group
+            obj.rod_o = Rod(group, l, g_o); % Rod representing the base curve
+            obj.rods = Rod.empty(0, length(g_o_rods));  % List of all actual rods
+            obj.adjoints = cell(1, length(g_o_rods));   % Store the list of adjoint matrices for computation.
 
-            % Create the base-curve
-            obj.rod_o = Rod(group, l, g_o); % TODO: Handle different muscle lengths?
-            obj.rods = Rod.empty(0, length(g_o_rods));
-
+            % Create the rods
             for i = 1 : length(g_o_rods)
+                adjoint_i_o = obj.group.Adjoint(g_o_rods{i});
                 g_0_i = g_o * g_o_rods{i};
+
                 obj.rods(i) = Rod(group, l, g_0_i);
+                obj.adjoints{i} = adjoint_i_o;
             end
         end
 
-        function strains = get_strains(obj)
-
+        % Set the base-curve twist-vector (g_circ_right)
+        function set_base_curve(obj, g_circ_right)
+            obj.rod_o.g_circ_right = g_circ_right;
+            
+            for i = 1 : length(obj.rods)
+                % Use the adjoint to compute each actuator's twist-vector,
+                % given the base-curve twist-vector. 
+                % Note that adjoint_i_o = inv(adjoint_o_i) which is the adjoint inverse
+                adjoint_i_o = obj.rods(i).adjoints{i};
+                g_circ_right_i = adjoint_i_o * g_circ_right;
+                obj.rods(i).g_circ_right = g_circ_right_i;
+            end
         end
 
-        function forces = get_forces(obj)
-
+        % Retrieve the base-curve twist-vector
+        function g_circ_right = get_base_curve(obj)
+            g_circ_right = obj.rod_o.g_circ_right;
         end
 
+        % Retrieve the base-curve tip pose
         function pose = get_tip_pose(obj)
             pose = obj.group.hat(obj.rod_o.calc_posns());
-        end
-
-        function ax = plot()
-            % TODO: Does this get refactored out?
         end
     end
 
