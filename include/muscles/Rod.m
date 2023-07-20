@@ -1,7 +1,8 @@
-classdef Muscle < handle & matlab.mixin.Copyable
-% Parent class for Muscle objects
-% - Handles general properties 
-% - Implements custom Setter functions (linking configuration <-> flow-vector)
+classdef Rod < handle & matlab.mixin.Copyable
+% General Rod class
+% - Stores and manages the twist-vector
+% - Coordinate free pose integration
+% - Can own a mechanics model and plotter instance
 % - Copy constructor
 
     %% Properties
@@ -25,7 +26,17 @@ classdef Muscle < handle & matlab.mixin.Copyable
     %% Methods
     methods
         %% Constructor
-        function obj = Muscle(group, g_0, l)
+        function obj = Rod(group, l, g_0)
+            arguments
+                group
+                l
+                g_0 = -1
+            end
+            
+            if g_0 == -1
+                g_0 = eye(group.mat_size);
+            end
+
             obj.group = group;
             obj.g_0 = g_0;
 
